@@ -1,0 +1,22 @@
+# This dockerfile builds a container for Lucene
+
+# This is the baseimage
+FROM centos
+
+MAINTAINER Kunal <kunal@finiteloop.me>
+
+# The openjdk package for yum to install
+ENV openjdk java-1.8.0-openjdk
+# The lucene package to be installed
+ENV package lucene-5.1.0.zip
+ENV lucene http://www.carfab.com/apachesoftware/lucene/java/5.1.0/lucene-5.1.0.zip
+# The directory where lucene should be installed
+ENV workdir lucene-sdk
+
+RUN yum -y install wget
+RUN yum -y install ${openjdk}
+RUN yum -y install unzip
+RUN mkdir ${workdir}
+RUN cd ${workdir}
+RUN wget ${lucene}
+RUN unzip -l ${package}

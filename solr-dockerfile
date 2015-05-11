@@ -1,0 +1,21 @@
+# This dockerfile builds a container for Solr
+
+FROM centos
+
+MAINTAINER "Kunal" <kunal@finiteloop.me>
+
+# The openjdk package for yum to install
+ENV openjdk java-1.8.0-openjdk
+# The solr package to be installed
+ENV package solr-5.1.0.zip
+ENV location http://mirror.reverse.net/pub/apache/lucene/solr/5.1.0/solr-5.1.0.zip
+# The directory where lucene should be installed
+ENV workdir solr-sdk
+
+RUN yum -y install wget
+RUN yum -y install ${openjdk}
+RUN yum -y install unzip
+RUN mkdir ${workdir}
+RUN cd ${workdir}
+RUN wget ${location}
+RUN unzip -l ${package}
