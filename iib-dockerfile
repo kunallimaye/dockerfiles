@@ -1,0 +1,39 @@
+#################################################
+#
+# ----------------------------------------------------------------------------
+#################################################
+# Build command
+# docker build -t iib --file=iib-dockerfile .
+# Run command
+# docker run -it -d --name iibd -P iib
+
+FROM centos:latest
+
+MAINTAINER "Kunal" <kunal@finiteloop.me>
+
+# Required to download the IIB binary
+RUN yum install -y curl tar
+# Required to run remote X services
+RUN yum install -y xorg-x11-xauth xorg-x11-fonts-* xorg-x11-font-utils xorg-x11-fonts-Type1
+# Required to test simple xclock application
+RUN yum install -y xorg-x11-apps
+# Install and run ssh server to allow remote access
+RUN yum install -y openssh-server && \
+    /usr/sbin/sshd-keygen && \
+    /usr/sbin/sshd
+
+# Install IIB V10 Developer edition
+RUN mkdir /opt/ibm
+RUN curl http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/integration/iib-10.0.0.0.tar.gz -o /tmp/iib-10.0.0.0.tar.gz && \
+    tar -xvf /tmp/iib-10.0.0.0.tar.gz -C /opt/ibm && \
+    /opt/ibm/iib-10.0.0.0/iib make registry global accept license silently
+
+# create a  non-root user to run as
+RUN useradd --create-home --home-dir /home/iibuser iibuser && \
+    echo "iibuser	ALL=(ALL) ALL" >> /etc/sudoers
+
+
+USER iibuser
+
+# Expose ssh port , default admin port and http port
+EXPOSE 22 4414 7800
